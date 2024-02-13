@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <style>
+        .tbl th {
+            border: solid 2px;
+            padding: 5px;
+        }
+
+        .tbl td {
+            border: solid 2px;
+            padding: 5px;
+        }
+    </style>
+    <script>
+        List = []
+        $(document).ready(function () {
+            Display();
+            $('#btn').click(function () {
+                Add();
+            })
+            $('#btnupdate').click(function () {
+                Update();
+            })
+            $('#btndelete').click(function () {
+                var Tid = $("#txtId").val();
+                DeleteTask(Tid);
+            })
+        })
+        function Display() {
+            $.ajax({
+                url: 'https://localhost:44343//api/List',
+                method: 'get',
+                contentType: 'application/json',
+                success: function (resp) {
+                    console.log(resp)
+                    $('#tbldata').empty();
+                    $.each(resp, function (i, d) {
+                        $('#tbldata').append("<tr><td>" + d.id + "</td><td>" + d.title + "</td><td>" +
+                            d.description + "</td><td>" + d.date + "</td><td>" + d.userid + "</td><td><input type='button' value='Edit' Onclick='ViewTask(" + d.id + ")'>"
+                            + "<input type='button' style='margin-left:10px' value='Delete' onclick='DeleteTask(" + d.id + ")'/></td></tr>");
+
+                    })
+                }
+            })
+
+        }
+        function Add() {
+            var Tid = $("#txtId").val();
+            var Ttitle = $("#txtTitle").val();
+            var Tdesc = $("#txtDes").val();
+            var Tdate = $("#txtDate").val();
+            var Tuid = $("#txtuid").val();
+            var st = { "id": Tid, "title": Ttitle, "description": Tdesc, "date": Tdate, "userid": Tuid };
+            $.ajax({
+
+                url: 'https://localhost:44343//api/AddTask',
+                method: 'post',
+                data: JSON.stringify(st),
+                contentType: 'application/json',
+                success: function (resp) {
+                    alert(resp)
+                    $("#txtId").val("");
+                    $("#txtTitle").val("");
+                    $("#txtDes").val("");
+                    $("#txtDate").val("");
+                    $("#txtuid").val("");
+                    Display();
+
+                }
+
+            })
+
+        }
+        function ViewTask(r) {
+
+            $.ajax({
+                url: 'https://localhost:44343//api/GetTask/' + r,
+                method: 'get',
+                contentType: 'application/json',
+                success: function (resp) {
+                    $("#txtId").val(resp.id);
+                    $("#txtTitle").val(resp.title);
+                    $("#txtDes").val(resp.description);
+                    $("#txtDate").val(resp.date);
+                    $("#txtuid").val(resp.userid);
+                }
+
+            })
+        }
+        function DeleteTask(d) {
+            var i = $('#txtId').val();
+            $.ajax({
+                url: 'https://localhost:44343//api/DeleteTask/' + d,
+                method: 'get',
+                contentType: 'application/json',
+                success: function (resp) {
+                    alert(resp);
+                    Display();
+                }
+
+            })
+        }
+        function Update() {
+            var Tid = $("#txtId").val();
+            var Ttitle = $("#txtTitle").val();
+            var Tdesc = $("#txtDes").val();
+            var Tdate = $("#txtDate").val();
+            var Tuid = $("#txtuid").val();
+            var st = { "id": Tid, "title": Ttitle, "description": Tdesc, "date": Tdate, "userid": Tuid };
+            $.ajax({
+
+                url: 'https://localhost:44343//api/UpdateTask',
+                method: 'post',
+                data: JSON.stringify(st),
+                contentType: 'application/json',
+                success: function (resp) {
+                    alert(resp)
+                    $("#txtId").val("");
+                    $("#txtTitle").val("");
+                    $("#txtDes").val("");
+                    $("#txtDate").val("");
+                    $("#txtuid").val("");
+                    Display();
+
+                }
+
+            })
+        }
+    </script>
+</head>
+<body>
+    <div style="margin-top:20px">
+        <table>
+            <tr>
+                <td>
+                    Task Id
+                </td>
+                <td>
+                    <input type="text" id="txtId" disabled />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Task Title
+                </td>
+                <td>
+                    <input type="text" id="txtTitle" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Task Description
+                </td>
+                <td>
+                    <input type="text" id="txtDes" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Task Date
+                </td>
+                <td>
+                    <input type="text" id="txtDate" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Userid
+                </td>
+                <td>
+                    <input type="text" id="txtuid" />
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td style="padding-top:5px">
+                    <input type="submit" id="btn" value="Add Task" />
+                    <input style="margin-left:5px" type="submit" id="btnupdate" value="Update Task" />
+                    <input style="margin-left:5px" type="submit" id="btndelete" value="Delete Task" />
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div style="margin-top:50px">
+        <table style="border:solid 2px" class="tbl">
+            <thead>
+                <tr>
+                    <th>Task Id</th>
+                    <th>Task Title</th>
+                    <th>Task Description</th>
+                    <th>Task Date</th>
+                    <th>Userid</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tbldata">
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
